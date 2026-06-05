@@ -15,6 +15,7 @@ import {
 import * as THREE from 'three';
 import BundleSelector, { BUNDLES, Bundle } from './BundleSelector';
 import Checkout from './Checkout';
+import DecisionExperience from './DecisionExperience';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -208,7 +209,10 @@ function Nav() {
           </button>
         ))}
       </div>
-      <button className="px-6 py-2 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-widest pointer-events-auto hover:bg-blue-400 hover:text-white transition-all">
+      <button 
+        onClick={() => document.getElementById('decision-experience')?.scrollIntoView({ behavior: 'smooth' })}
+        className="px-6 py-2 bg-white text-black rounded-full font-black text-[10px] uppercase tracking-widest pointer-events-auto hover:bg-blue-400 hover:text-white transition-all"
+      >
         Buy Now
       </button>
     </nav>
@@ -217,6 +221,7 @@ function Nav() {
 
 export default function Experience() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useRef({ value: 0 });
   const [selectedBundle, setSelectedBundle] = useState<Bundle>(BUNDLES[0]);
 
@@ -228,6 +233,16 @@ export default function Experience() {
       scrub: 1,
       onUpdate: (self) => {
         scrollProgress.current.value = self.progress;
+      }
+    });
+
+    gsap.to(canvasContainerRef.current, {
+      opacity: 0,
+      scrollTrigger: {
+        trigger: "#decision-experience",
+        start: "top bottom",
+        end: "top 20%",
+        scrub: true,
       }
     });
 
@@ -251,7 +266,7 @@ export default function Experience() {
     <div ref={containerRef} className="relative bg-black text-white">
       <Nav />
       
-      <div className="fixed inset-0 z-0 h-screen w-full">
+      <div ref={canvasContainerRef} className="fixed inset-0 z-0 h-screen w-full">
         <Canvas shadows camera={{ position: [0, 0, 7], fov: 40 }}>
           <Scene scrollProgress={scrollProgress.current} />
         </Canvas>
@@ -363,36 +378,7 @@ export default function Experience() {
         </div>
       </section>
 
-      <section className="relative min-h-screen flex flex-col items-center justify-center z-10 text-center px-12 py-32">
-        <div className="section-content w-full max-w-4xl">
-          <h2 className="text-8xl font-black italic tracking-tighter uppercase mb-12">Claim Yours.</h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-            <div className="glass p-8 rounded-[3rem] text-left">
-              <h3 className="text-xl font-bold uppercase tracking-widest mb-6 text-blue-400">Select Configuration</h3>
-              <BundleSelector selectedBundle={selectedBundle} onSelect={setSelectedBundle} />
-            </div>
-
-            <div className="glass p-12 rounded-[4rem] w-full flex flex-col items-center gap-10">
-              <div className="flex justify-between w-full items-end border-b border-white/10 pb-8">
-                <div className="text-left">
-                  <p className="text-sm font-mono text-gray-500 uppercase tracking-widest">{selectedBundle.name.toUpperCase()}</p>
-                  <p className="text-5xl font-bold tracking-tighter mt-2">&euro;{selectedBundle.price}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-blue-400 font-bold uppercase tracking-widest">Free Global Orbit</p>
-                </div>
-              </div>
-              
-              <div className="w-full">
-                <Checkout selectedBundle={selectedBundle} />
-              </div>
-              
-              <p className="text-[10px] font-mono text-gray-600 tracking-[0.2em]">SHIPS WITHIN 24 HOURS. 30-DAY MISSION GUARANTEE.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <DecisionExperience />
 
       <div className="fixed bottom-10 left-10 z-20 pointer-events-none hidden lg:block">
         <div className="font-mono text-[8px] tracking-[0.3em] text-gray-600 space-y-2 uppercase">
